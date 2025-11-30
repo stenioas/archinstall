@@ -69,7 +69,8 @@ EOF
  instructions entirely before proceeding.
 ────────────────────────────────────────────────────────────────────
 EOF
-  
+  )
+
   _print_msg "$(set_bcyan)${banner}$(reset)"
   _print_msg "\n Welcome to my $(set_bcyan)${SCRIPT_TITLE}$(reset) - v${SCRIPT_VERSION}$(reset)"
   echo
