@@ -17,13 +17,13 @@ trap "tput cnorm" EXIT # Ensures the cursor returns to normal
 trap "exit 1" INT      # Ensures the script stops with Ctrl+C
 sudo -v                # Ensures the sudo password is ready
 
+. <(curl -fsSL https://raw.githubusercontent.com/stenioas/bash-toolkit/main/bash-toolkit.lib)
+
 # ============================================================================
 # .ENV
 # ----------------------------------------------------------------------------
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-
-. <(curl -fsSL https://raw.githubusercontent.com/stenioas/bash-toolkit/main/bash-toolkit.lib)
 
 SCRIPT_TITLE="Arch Linux Post-Installation Script"
 SCRIPT_VERSION="1.0.0-beta"
@@ -33,6 +33,7 @@ SCRIPT_VERSION="1.0.0-beta"
 # ----------------------------------------------------------------------------
 
 main() {
+  # bash-toolkit function
   _check_connection
 
 
@@ -77,6 +78,12 @@ EOF
   _print_msg "${msg}"
   _print_msg "$(set_byellow)${alert}$(reset)"
   _pause
+
+
+  #------------------------------#
+  # INITIALIZATION
+  #------------------------------#
+  bash ${SCRIPT_DIR}/scripts/bootstrap.sh
 
 
   #------------------------------#

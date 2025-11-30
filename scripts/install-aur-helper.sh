@@ -8,10 +8,10 @@ set -euo pipefail
 trap "tput cnorm" EXIT # Ensures the cursor returns to normal
 trap "exit 1" INT      # Ensures the script stops with Ctrl+C
 
+. <(curl -fsSL https://raw.githubusercontent.com/stenioas/bash-toolkit/main/bash-toolkit.lib)
+
 # ----------------------------------------------------------------------------
 # .ENV
-
-. <(curl -fsSL https://raw.githubusercontent.com/stenioas/bash-toolkit/main/bash-toolkit.lib)
 
 TEMP_CLONE_DIR="$(mktemp -d)"
 
