@@ -24,9 +24,7 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 IFS=$'\n\t'
 
 MODULE="$1"
-MODULE_FILE="${SCRIPT_DIR}/../modules/${MODULE}.yml"
-
-# PACKAGE LIST
+MODULE_FILE="${SCRIPT_DIR}/${MODULE}.yml"
 
 # ----------------------------------------------------------------------------
 # EXECUTION
@@ -70,3 +68,5 @@ main() {
     done
   fi
 }
+
+main

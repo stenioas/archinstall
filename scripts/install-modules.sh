@@ -28,7 +28,7 @@ main() {
 
   for module in $modules; do
     _print_title "Installing module: ${module}"
-    ./${SCRIPT_DIR}/../modules/install-module.sh "${module}"
+    bash ${SCRIPT_DIR}/../modules/install-module.sh "${module}"
   done
 }
 
