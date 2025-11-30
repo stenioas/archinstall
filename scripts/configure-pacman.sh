@@ -18,9 +18,6 @@ sudo -v                # Ensures the sudo password is ready
 # EXECUTION
 
 main() {
-  #------------------------------#
-  # CHECK DEPENDENCIES
-  #------------------------------#
   if ! command -v reflector &> /dev/null; then
     sudo pacman -S --noconfirm --needed "reflector"
   fi

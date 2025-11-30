@@ -32,17 +32,10 @@ MODULE_FILE="${SCRIPT_DIR}/../modules/${MODULE}.yml"
 # EXECUTION
 
 main() {
-  #------------------------------#
-  # CHECK DEPENDENCIES
-  #------------------------------#
   if ! command -v yq &> /dev/null; then
     sudo pacman -S --noconfirm --needed "go-yq"
   fi
 
-
-  #------------------------------#
-  # INSTALLATION
-  #------------------------------#
   _print_title "MODULE: ${MODULE}"
   
   if [[ -f ${MODULE_FILE} ]]; then

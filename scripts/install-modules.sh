@@ -20,6 +20,10 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 # EXECUTION
 
 main() {
+  if ! command -v yq &> /dev/null; then
+    sudo pacman -S --noconfirm --needed "go-yq"
+  fi
+
   local modules=$(yq e ".modules[]" "${SCRIPT_DIR}/../postinstall.config.yml")
 
   for module in $modules; do
