@@ -1,5 +1,6 @@
 {
   "custom_commands": [],
+  "hostname": "gbook4",
   "kernels": ["linux-lts"],
   "locale_config": {
     "kb_layout": "us-acentos",
@@ -13,5 +14,5 @@
   "parallel_downloads": 12,
   "services": [],
   "timezone": "America/Fortaleza",
-  "version": "3.0.11"
+  "version": "3.0.14"
 }
