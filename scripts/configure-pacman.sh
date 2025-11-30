@@ -18,6 +18,13 @@ sudo -v                # Ensures the sudo password is ready
 # EXECUTION
 
 main() {
+  #------------------------------#
+  # CHECK DEPENDENCIES
+  #------------------------------#
+  if ! command -v reflector &> /dev/null; then
+    sudo pacman -S --noconfirm --needed "reflector"
+  fi
+
   _print_title "Pacman Configuration"
   _print_msg "Configuring pacman.conf..."
   sudo sed -i '4,$s/^#Color/Color/' /etc/pacman.conf
