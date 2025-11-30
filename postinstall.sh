@@ -83,13 +83,13 @@ EOF
   #------------------------------#
   # INITIALIZATION
   #------------------------------#
+  bash ${SCRIPT_DIR}/scripts/configure-pacman.sh
   bash ${SCRIPT_DIR}/scripts/bootstrap.sh
 
 
   #------------------------------#
   # INSTALLATION
   #------------------------------#
-  bash ${SCRIPT_DIR}/scripts/configure-pacman.sh
   bash ${SCRIPT_DIR}/scripts/install-aur-helper.sh
   bash ${SCRIPT_DIR}/scripts/install-modules.sh
   bash ${SCRIPT_DIR}/scripts/install-dotfiles.sh
