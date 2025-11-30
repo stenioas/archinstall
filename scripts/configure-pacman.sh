@@ -1,15 +1,7 @@
 #!/usr/bin/env bash
-# ----------------------------------------------------------------------------
-# Name        : configure-pacman.sh
-# Description : Pacman Configuration Script
-# Version     : 0.0.1-beta
-# Author      : Stenio Silveira <stenioas@gmail.com>
-# Date        : 11/11/2025
-# License     : GNU/GPL v3.0
 
-# ============================================================================
-# INITIALIZATION AND CLEANUP COMMANDS (TRAP/SUDO)
-# ============================================================================
+# ----------------------------------------------------------------------------
+# INITIALIZATION
 
 set -euo pipefail
 
@@ -17,26 +9,20 @@ trap "tput cnorm" EXIT # Ensures the cursor returns to normal
 trap "exit 1" INT      # Ensures the script stops with Ctrl+C
 sudo -v                # Ensures the sudo password is ready
 
-# ============================================================================
+# ----------------------------------------------------------------------------
 # .ENV
+
+. <(curl -fsSL https://raw.githubusercontent.com/stenioas/bash-toolkit/main/bash-toolkit.lib)
+
 # ----------------------------------------------------------------------------
-
-SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-
-IFS=$'\n\t'
-
-. ${SCRIPT_DIR}/../libs/utils.sh
-
-# ============================================================================
-# RUN CONFIGURATION
-# ----------------------------------------------------------------------------
+# EXECUTION
 
 main() {
   _print_title "Pacman Configuration"
   _print_msg "Configuring pacman.conf..."
   sudo sed -i '4,$s/^#Color/Color/' /etc/pacman.conf
   sudo sed -i '4,$s/^#VerbosePkgLists/VerbosePkgLists/' /etc/pacman.conf
-  sudo sed -i 's/^ParallelDownloads = [0-9]\+/ParallelDownloads = 20/' /etc/pacman.conf
+  sudo sed -i 's/^ParallelDownloads = [0-9]\+/ParallelDownloads = 12/' /etc/pacman.conf
   sudo sed -i '/^ParallelDownloads/a ILoveCandy' /etc/pacman.conf
   
   # Enable multilib if it exists and is commented

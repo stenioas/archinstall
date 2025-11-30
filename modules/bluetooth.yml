@@ -1,0 +1,15 @@
+# Bluetooth Module
+---
+name: bluetooth
+description: >
+  A module to install and configure Bluetooth support on the system.
+  This includes necessary packages and services to enable Bluetooth functionality.
+
+packages:
+  - bluez
+  - bluez-utils
+  - bluez-libs
+  - blueman
+
+services:
+  - bluetooth.service

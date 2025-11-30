@@ -1,0 +1,43 @@
+# Hyprland Module
+---
+name: de-hyprland
+description: >
+  A module to install and configure the Hyprland desktop environment on the system.
+  This includes necessary packages and services to enable Hyprland functionality.
+
+commands:
+  - xdg-user-dirs-update # Update user directories
+
+packages:
+  - hyprland # Wayland compositor for dynamic tiling
+  - hyprlock # Screen locker for Hyprland
+  - hyprsunset # Blue light filter for Hyprland
+  - hypridle # Idle management daemon for Hyprland
+  - hyprcursor # Cursor theme specification for Hyprland
+  - hyprpaper # Wallpaper utility for Hyprland
+  - hyprpicker # Color picker for Wayland
+  - hyprpolkitagent # Polkit authentication agent for Hyprland
+  - uwsm # Universal Wayland Session Manager
+  - waybar # Customizable status bar for Wayland
+  - kitty # GPU-based terminal emulator
+  - rofi-wayland # Application launcher for Wayland
+  - xdg-desktop-portal-hyprland # XDG portal backend for Hyprland
+  - xdg-desktop-portal-gtk # XDG portal backend for GTK
+  - xdg-user-dirs # Utility for user directories
+  - xdg-utils # Utilities for XDG
+  - qt5-wayland # Qt 5 Wayland integration platform
+  - qt6-wayland # Qt 6 Wayland integration platform
+  - cliphist # Clipboard history utility for Wayland
+  - grim # Screenshot tool for Wayland
+  - slurp # Select region for screenshots in Wayland
+  - swaync # Notification daemon for Wayland
+  - thunar # XFCE file manager
+  - thunar-volman # Volume management extension for Thunar
+  - thunar-archive-plugin # Archive plugin for Thunar
+  - tumbler # D-Bus thumbnail service
+  - gvfs # Virtual filesystem for Gnome
+  - ffmpegthumbnailer # Video thumbnailer
+  - nwg-look # GTK theme editor for Wayland
+  - nwg-displays # Display configuration utility for Wayland
+  - yazi # Modern terminal file manager (Rust)
+  - mpv # Media player

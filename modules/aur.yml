@@ -1,0 +1,12 @@
+# AUR Module
+---
+name: aur
+description: >
+  A module to install and configure AUR packages for the system.
+  This includes necessary packages from the Arch User Repository for enhanced functionality.
+
+packages:
+  - bruno-bin
+  - spotify
+  - visual-studio-code-bin
+  - google-chrome

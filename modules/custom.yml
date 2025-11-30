@@ -1,0 +1,13 @@
+# Custom Module
+---
+name: custom
+description: >
+  A module to install and configure custom system components.
+  This includes necessary packages and services for system optimization.
+
+packages:
+  - intel-ucode # Intel CPU microcode updates.
+  - sof-firmware # Sound Open Firmware for audio DSPs.
+
+services:
+  - fstrim.timer # Periodic TRIM for SSDs and NVMe drives.

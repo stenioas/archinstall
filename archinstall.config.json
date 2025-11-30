@@ -9,7 +9,7 @@
   "network_config": {
     "type": "nm"
   },
-  "packages": ["linux-lts-headers"],
+  "packages": ["linux-lts-headers", "git"],
   "services": [],
   "timezone": "America/Fortaleza",
   "version": "3.0.11"

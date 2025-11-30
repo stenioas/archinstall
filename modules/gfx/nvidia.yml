@@ -1,0 +1,16 @@
+# NVIDIA Graphics Module
+---
+name: gfx-nvidia
+description: >
+  A module to install and configure NVIDIA graphics support on the system.
+  This includes necessary packages and drivers for NVIDIA GPUs.
+
+packages:
+  - mesa
+  - lib32-mesa
+  - dkms
+  - nvidia-dkms
+  - nvidia-settings
+  - nvidia-utils
+  - lib32-nvidia-utils
+  - libva-nvidia-driver

@@ -1,0 +1,19 @@
+# Utilities Module
+---
+name: utilities
+description: >
+  A module to install and configure essential utilities for the system.
+  This includes necessary packages for system management and productivity.
+
+packages:
+  - reflector # Tool for managing Arch Linux mirror lists.
+  - nano # Simple text editor.
+  - wget # Utility for non-interactive downloads.
+  - zip # Package and compress files.
+  - unzip # Decompress zip files.
+  - lsof # List open files.
+  - btop # Resource monitor for the terminal.
+  - htop # Interactive process viewer for Unix systems.
+  - ntfs-3g # NTFS filesystem driver
+  - bash-completion # Programmable completion for Bash.,
+  - gnome-keyring # Password management and encryption tool.

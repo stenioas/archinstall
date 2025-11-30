@@ -1,0 +1,14 @@
+# Softwares Module
+---
+name: softwares
+description: >
+  A module to install common software packages for general use.
+  This includes web browsers, media players, and other essential applications.
+  You can customize the list of packages as needed.
+packages:
+  - firefox
+  - firefox-i18n-pt-br
+  - gimp
+  - inkscape
+  - vlc
+  - pavucontrol

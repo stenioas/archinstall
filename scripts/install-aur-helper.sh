@@ -7,28 +7,30 @@ set -euo pipefail
 
 trap "tput cnorm" EXIT # Ensures the cursor returns to normal
 trap "exit 1" INT      # Ensures the script stops with Ctrl+C
-sudo -v                # Ensures the sudo password is ready
 
 # ----------------------------------------------------------------------------
 # .ENV
 
 . <(curl -fsSL https://raw.githubusercontent.com/stenioas/bash-toolkit/main/bash-toolkit.lib)
 
-TARGET_DIR="${HOME}/git/github/dotfiles"
+TEMP_CLONE_DIR="$(mktemp -d)"
 
 # ----------------------------------------------------------------------------
 # EXECUTION
 
 main() {
-  _print_title "Dotfiles installation"
-  if [[ -d ${TARGET_DIR} ]]; then
-    _print_msg "Dotfiles folder already exists. A backup will be created in ${TARGET_DIR}_old_$(date +%Y%m%d%H%M%S)!"
-    mv ${TARGET_DIR} "${TARGET_DIR}_old_$(date +%Y%m%d%H%M%S)"
+  _print_title "AUR helper installation"
+  if pacman -Qi yay &> /dev/null; then
+    _print_msg "YAY is already installed!"
+    return
   fi
 
-  _print_msg "Cloning and installing dotfiles from GitHub..."
-  git clone https://github.com/stenioas/dotfiles.git ${TARGET_DIR}
-  bash ${TARGET_DIR}/install-dotfiles.sh
+  git clone https://aur.archlinux.org/yay.git "${TEMP_CLONE_DIR}/yay"
+  cd "${TEMP_CLONE_DIR}/yay"
+  makepkg -csi --noconfirm
+  cd ${HOME}
+
+  _print_msg "AUR helper installation completed successfully!"
 }
 
 main

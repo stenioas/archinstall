@@ -1,0 +1,17 @@
+# Virt-Manager Module
+---
+name: virt-manager
+description: >
+  A module to install and configure Virtual Machine Manager for the system.
+  This includes necessary packages for virtualization and network management.
+
+commands:
+  - sudo systemctl enable libvirtd.service
+  - sudo usermod -aG libvirt ${USER}
+
+packages:
+  - qemu-desktop
+  - libvirt
+  - virt-manager
+  - dnsmasq
+  - ebtables

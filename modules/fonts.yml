@@ -1,0 +1,15 @@
+# Fonts Module
+---
+name: fonts
+description: >
+  A module to install and configure fonts for the system.
+  This includes necessary packages for enhanced font support and typography.
+
+packages:
+  - noto-fonts
+  - noto-fonts-emoji
+  - noto-fonts-cjk
+  - ttf-liberation
+  - otf-font-awesome
+  - ttf-jetbrains-mono
+  - ttf-jetbrains-mono-nerd

@@ -1,0 +1,15 @@
+# Pipewire Module
+---
+name: pipewire
+description: >
+  A module to install and configure Pipewire for the system.
+  This includes necessary packages for enhanced audio and video processing.
+
+packages:
+  - pipewire
+  - pipewire-alsa
+  - pipewire-jack
+  - pipewire-pulse
+  - pipewire-audio
+  - wireplumber
+  - lib32-pipewire

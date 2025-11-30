@@ -1,15 +1,7 @@
 #!/usr/bin/env bash
-# ----------------------------------------------------------------------------
-# Name        : configure-pacman.sh
-# Description : Pacman Configuration Script
-# Version     : 0.0.1-beta
-# Author      : Stenio Silveira <stenioas@gmail.com>
-# Date        : 11/11/2025
-# License     : GNU/GPL v3.0
 
-# ============================================================================
-# INITIALIZATION AND CLEANUP COMMANDS (TRAP/SUDO)
-# ============================================================================
+# ----------------------------------------------------------------------------
+# INITIALIZATION
 
 set -euo pipefail
 
@@ -17,41 +9,44 @@ trap "tput cnorm" EXIT # Ensures the cursor returns to normal
 trap "exit 1" INT      # Ensures the script stops with Ctrl+C
 sudo -v                # Ensures the sudo password is ready
 
-# ============================================================================
+# ----------------------------------------------------------------------------
 # .ENV
-# ----------------------------------------------------------------------------
 
-SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-
-IFS=$'\n\t'
-
-. ${SCRIPT_DIR}/../libs/utils.sh
-
-# ============================================================================
-# RUN CONFIGURATION
-# ----------------------------------------------------------------------------
+. <(curl -fsSL https://raw.githubusercontent.com/stenioas/bash-toolkit/main/bash-toolkit.lib)
 
 LY_PAM_FILE="/etc/pam.d/ly"
 
-# Verifica se o arquivo existe
-if [ ! -f "$LY_PAM_FILE" ]; then
-    echo "Erro: O arquivo PAM do Ly nao foi encontrado em $LY_PAM_FILE."
-    echo "Verifique se o Ly esta instalado."
-    exit 1
-fi
+# ----------------------------------------------------------------------------
+# EXECUTION
 
-_print_msg "Iniciando configuracao do PAM para o Ly..."
+main() {
+    if ! command -v ly &> /dev/null; then
+        _print_error "Ly is not installed. Skipping PAM configuration."
+        exit 1
+    elif [ ! -f "$LY_PAM_FILE" ]; then
+        _print_error "Error: The Ly PAM file was not found at $LY_PAM_FILE."
+        _print_error "Please check if Ly is installed."
+        exit 1
+    elif ! command -v gnome-keyring &> /dev/null; then
+        _print_error "GNOME Keyring is not installed. Skipping PAM configuration for Ly."
+        exit 1
+    fi
 
-_print_msg "Corrigindo 'auth'..."
-sudo sed -i '/pam_gnome_keyring.so/ s/^-auth/auth/' "$LY_PAM_FILE"
+    _print_msg "Starting PAM configuration for Ly..."
 
-# Corrigir a secao 'password'
-_print_msg "Corrigindo 'password'..."
-sudo sed -i '/pam_gnome_keyring.so use_authtok/ s/^-password/password/' "$LY_PAM_FILE"
+    _print_msg "Fixing 'auth'..."
+    sudo sed -i '/pam_gnome_keyring.so/ s/^-auth/auth/' "$LY_PAM_FILE"
 
-# Corrigir a secao 'session'
-_print_msg "Corrigindo 'session'..."
-sudo sed -i '/pam_gnome_keyring.so auto_start/ s/^-session/session/' "$LY_PAM_FILE"
+    # Fix the 'password' section
+    _print_msg "Fixing 'password'..."
+    sudo sed -i '/pam_gnome_keyring.so use_authtok/ s/^-password/password/' "$LY_PAM_FILE"
 
-_print_msg "Configuracao do PAM concluida com sucesso!"
-_print_msg "Voce deve reiniciar o Ly (ou o computador) para que as alteracoes entrem em vigor."
+    # Corrigir a secao 'session'
+    _print_msg "Fixing 'session'..."
+    sudo sed -i '/pam_gnome_keyring.so auto_start/ s/^-session/session/' "$LY_PAM_FILE"
+
+    _print_msg "PAM configuration completed successfully!"
+    _print_msg "You must restart Ly (or the computer) for the changes to take effect."
+}
+
+main

@@ -1,0 +1,19 @@
+# Development Module
+---
+name: development
+description: >
+  A module to install and configure development tools and environments.
+  This includes necessary packages for software development and version control.
+
+commands:
+  - sudo usermod -aG docker "${USER}"
+
+packages:
+  - git
+  - github-cli
+  - python
+  - docker
+  - docker-compose
+
+services:
+  - docker
