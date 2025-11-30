@@ -10,6 +10,7 @@
     "type": "nm"
   },
   "packages": ["linux-lts-headers", "git"],
+  "parallel_downloads": 12,
   "services": [],
   "timezone": "America/Fortaleza",
   "version": "3.0.11"
