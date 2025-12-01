@@ -33,6 +33,8 @@ main() {
   _print_msg "Updating mirrorlist..."
   sudo reflector -c Brazil --latest 10 --sort rate --verbose --save /etc/pacman.d/mirrorlist
 
+  sudo pacman -Sy
+
   _print_msg "Configuring pacman completed successfully!"
 }
 

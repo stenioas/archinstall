@@ -14,12 +14,12 @@ trap "tput cnorm" EXIT # Ensures the cursor returns to normal
 trap "exit 1" INT      # Ensures the script stops with Ctrl+C
 sudo -v                # Ensures the sudo password is ready
 
+. <(curl -fsSL https://raw.githubusercontent.com/stenioas/bash-toolkit/main/bash-toolkit.lib)
+
 # ----------------------------------------------------------------------------
 # .ENV
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-
-. <(curl -fsSL https://raw.githubusercontent.com/stenioas/bash-toolkit/main/bash-toolkit.lib)
 
 IFS=$'\n\t'
 
@@ -30,16 +30,12 @@ MODULE_FILE="${SCRIPT_DIR}/${MODULE}.yml"
 # EXECUTION
 
 main() {
-  if ! command -v yq &> /dev/null; then
-    sudo pacman -S --noconfirm --needed "go-yq"
-  fi
-
   _print_title "MODULE: ${MODULE}"
   
   if [[ -f ${MODULE_FILE} ]]; then
-    mapfile -t PKG_LIST < <(yq -r ".packages[]" "${MODULE_FILE}")
-    mapfile -t CMD_LIST < <(yq -r ".commands[]" "${MODULE_FILE}")
-    mapfile -t SVC_LIST < <(yq -r ".services[]" "${MODULE_FILE}")
+    mapfile -t PKG_LIST < <(./builder.py --list packages --module "${MODULE}")
+    mapfile -t CMD_LIST < <(./builder.py --list commands --module "${MODULE}")
+    mapfile -t SVC_LIST < <(./builder.py --list services --module "${MODULE}")
   else
     _print_msg "Warning: Module file not found: ${MODULE_FILE}. Skipping package installation."
     PKG_LIST=()

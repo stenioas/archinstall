@@ -20,16 +20,32 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 # EXECUTION
 
 main() {
-  if ! command -v yq &> /dev/null; then
-    sudo pacman -S --noconfirm --needed "go-yq"
+  _print_title "Modules Installation"
+
+  mapfile -t PKG_LIST < <(./builder.py --list packages)
+  mapfile -t CMD_LIST < <(./builder.py --list commands)
+  mapfile -t SVC_LIST < <(./builder.py --list services)
+  
+  if [[ ${#PKG_LIST[@]} -ne 0 ]]; then
+    _print_title "Package installation"
+    yay -S --noconfirm --needed "${PKG_LIST[@]}"
   fi
 
-  local modules=$(yq e ".modules[]" "${SCRIPT_DIR}/../postinstall.config.yml")
+  if [[ ${#CMD_LIST[@]} -ne 0 ]]; then
+    _print_title "Command execution"
+    for cmd in "${CMD_LIST[@]}"; do
+      _print_msg "==> Running: ${cmd}..."
+      eval "${cmd}" || { echo "$(set_bred)Error:$(reset) Command failed: ${cmd}"; exit 1; }
+    done
+  fi
 
-  for module in $modules; do
-    _print_title "Installing module: ${module}"
-    bash ${SCRIPT_DIR}/../modules/install-module.sh "${module}"
-  done
+  if [[ ${#SVC_LIST[@]} -ne 0 ]]; then
+    _print_title "Service enablement"
+    for service in "${SVC_LIST[@]}"; do
+      _print_msg "==> Enabling service: ${service}..."
+      sudo systemctl enable --now "${service}" || { echo "$(set_bred)Error:$(reset) Failed to enable service: ${service}"; exit 1; }
+    done
+  fi
 }
 
 main
