@@ -20,7 +20,7 @@ LY_PAM_FILE="/etc/pam.d/ly"
 # EXECUTION
 
 main() {
-    if ! command -v ly &> /dev/null; then
+    if ! pacman -Qi ly &> /dev/null; then
         _print_error "Ly is not installed. Skipping PAM configuration."
         exit 1
     elif [ ! -f "$LY_PAM_FILE" ]; then

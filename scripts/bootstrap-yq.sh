@@ -12,6 +12,7 @@ sudo -v                # Ensures the sudo password is ready
 . <(curl -fsSL https://raw.githubusercontent.com/stenioas/bash-toolkit/main/bash-toolkit.lib)
 
 # ----------------------------------------------------------------------------
+# .ENV
 
 YQ_BIN_NAME="yq"
 YQ_INSTALL_PATH="/usr/local/bin"

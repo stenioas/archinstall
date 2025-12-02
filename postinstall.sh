@@ -28,11 +28,28 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 SCRIPT_TITLE="Arch Linux Post-Installation Script"
 SCRIPT_VERSION="1.0.0-beta"
 
+# Log file configuration
+LOG_FILE="${HOME}/postinstall-$(date +%Y%m%d-%H%M%S).log"
+
 # ============================================================================
 # EXECUTION
 # ----------------------------------------------------------------------------
 
 main() {
+  #------------------------------#
+  # LOG INITIALIZATION
+  #------------------------------#
+  # Initialize log file
+  echo "==================================================================" > "${LOG_FILE}"
+  echo "  ${SCRIPT_TITLE} - v${SCRIPT_VERSION}" >> "${LOG_FILE}"
+  echo "  Started at: $(date '+%Y-%m-%d %H:%M:%S')" >> "${LOG_FILE}"
+  echo "==================================================================" >> "${LOG_FILE}"
+  echo "" >> "${LOG_FILE}"
+
+
+  #------------------------------#
+  # CHECK
+  #------------------------------#
   # bash-toolkit function
   _check_connection
 
@@ -96,7 +113,6 @@ EOF
   bash ${SCRIPT_DIR}/scripts/configure-keyring.sh
   bash ${SCRIPT_DIR}/scripts/install-themes.sh
 
-
   #------------------------------#
   # SYSTEM CLEANUP
   #------------------------------#
@@ -113,13 +129,23 @@ EOF
     _print_msg "No orphaned packages to remove!"
   fi
 
-  _print_msg "System cleanup completed successfully!"
-
-
   #------------------------------#
   # FINISH
   #------------------------------#
   _print_msg "\n$(set_bgreen)All done! $(set_bcyan)You can now restart your system.$(reset)"
+
+
+  #------------------------------#
+  # LOG FINALIZATION
+  #------------------------------#
+  echo "" >> "${LOG_FILE}"
+  echo "==================================================================" >> "${LOG_FILE}"
+  echo "  Finished at: $(date '+%Y-%m-%d %H:%M:%S')" >> "${LOG_FILE}"
+  echo "  Log file: ${LOG_FILE}" >> "${LOG_FILE}"
+  echo "==================================================================" >> "${LOG_FILE}"
+  
+  _print_msg "\n$(set_bgreen)Log saved to:$(reset) ${LOG_FILE}"
 }
 
-main
+# Redirect all output (stdout and stderr) to both terminal and log file
+main 2>&1 | tee -a "${LOG_FILE}""

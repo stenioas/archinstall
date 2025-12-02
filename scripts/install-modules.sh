@@ -12,11 +12,6 @@ sudo -v                # Ensures the sudo password is ready
 . <(curl -fsSL https://raw.githubusercontent.com/stenioas/bash-toolkit/main/bash-toolkit.lib)
 
 # ----------------------------------------------------------------------------
-# .ENV
-
-SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-
-# ----------------------------------------------------------------------------
 # EXECUTION
 
 main() {
