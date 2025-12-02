@@ -6,7 +6,6 @@ description: >
   This includes necessary packages for virtualization and network management.
 
 commands:
-  - sudo systemctl enable libvirtd.service
   - sudo usermod -aG libvirt ${USER}
 
 packages:
@@ -15,3 +14,6 @@ packages:
   - virt-manager
   - dnsmasq
   - ebtables
+
+services:
+  - libvirtd

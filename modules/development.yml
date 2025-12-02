@@ -15,5 +15,8 @@ packages:
   - docker
   - docker-compose
 
+aur_packages:
+  - bruno-bin
+
 services:
   - docker

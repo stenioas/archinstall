@@ -17,17 +17,28 @@ sudo -v                # Ensures the sudo password is ready
 main() {
   _print_title "Modules Installation"
 
-  mapfile -t PKG_LIST < <(./builder.py --list packages)
+  if ! command -v yay &> /dev/null; then
+    _print_msg "==> 'yay' not found. Exiting..."
+    exit 1
+  fi
+
   mapfile -t CMD_LIST < <(./builder.py --list commands)
+  mapfile -t PKG_LIST < <(./builder.py --list packages)
+  mapfile -t AUR_LIST < <(./builder.py --list aur_packages)
   mapfile -t SVC_LIST < <(./builder.py --list services)
   
   if [[ ${#PKG_LIST[@]} -ne 0 ]]; then
-    _print_title "Package installation"
-    yay -S --noconfirm --needed "${PKG_LIST[@]}"
+    _print_msg "Installing packages..."
+    sudo pacman -S --noconfirm --needed "${PKG_LIST[@]}"
+  fi
+
+  if [[ ${#AUR_LIST[@]} -ne 0 ]]; then
+    _print_msg "Installing AUR packages..."
+    yay -S --noconfirm --needed "${AUR_LIST[@]}"
   fi
 
   if [[ ${#CMD_LIST[@]} -ne 0 ]]; then
-    _print_title "Command execution"
+    _print_msg "Executing commands..."
     for cmd in "${CMD_LIST[@]}"; do
       _print_msg "==> Running: ${cmd}..."
       eval "${cmd}" || { echo "$(set_bred)Error:$(reset) Command failed: ${cmd}"; exit 1; }
@@ -35,7 +46,7 @@ main() {
   fi
 
   if [[ ${#SVC_LIST[@]} -ne 0 ]]; then
-    _print_title "Service enablement"
+    _print_msg "Enabling services..."
     for service in "${SVC_LIST[@]}"; do
       _print_msg "==> Enabling service: ${service}..."
       sudo systemctl enable "${service}" || { echo "$(set_bred)Error:$(reset) Failed to enable service: ${service}"; exit 1; }

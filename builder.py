@@ -32,6 +32,7 @@ def collect_builder_modules(config):
     """
     commands = set()
     packages = set()
+    aur_packages = set()
     services = set()
 
     # Get the list of modules from the configuration
@@ -54,6 +55,9 @@ def collect_builder_modules(config):
             
             if module_src.get("packages"):
                 packages.update(module_src["packages"])
+            
+            if module_src.get("aur_packages"):
+                aur_packages.update(module_src["aur_packages"])
                 
             if module_src.get("services"):
                 services.update(module_src["services"])
@@ -61,7 +65,7 @@ def collect_builder_modules(config):
         except Exception as e:
             print(f"Error reading module '{module}': {e}", file=sys.stderr)
 
-    return commands, sorted(packages), services
+    return commands, sorted(packages), sorted(aur_packages), sorted(services)
 
 
 def main():
@@ -72,9 +76,9 @@ def main():
     # Made --list required since we are no longer generating an output file
     parser.add_argument(
         "-l", "--list",
-        choices=["commands", "packages", "services"],
+        choices=["commands", "packages", "aur_packages", "services"],
         required=True,
-        help="Type of list required: commands, packages or services."
+        help="Type of list required: commands, packages, aur_packages or services."
     )
     
     parser.add_argument(
@@ -102,7 +106,7 @@ def main():
             sys.exit(1)
 
     try:
-        commands, packages, services = collect_builder_modules(builder_config)
+        commands, packages, aur_packages, services = collect_builder_modules(builder_config)
     except Exception as e:
         print(f"Error during module collection: {e}", file=sys.stderr)
         sys.exit(1)
@@ -115,6 +119,8 @@ def main():
         items = sorted(list(commands)) # Sorted for deterministic output
     elif args.list == "services":
         items = sorted(list(services))
+    elif args.list == "aur_packages":
+        items = sorted(list(aur_packages))
 
     # Print results to stdout
     if items:

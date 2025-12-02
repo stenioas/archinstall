@@ -14,7 +14,9 @@ sudo -v                # Ensures the sudo password is ready
 # ----------------------------------------------------------------------------
 # .ENV
 
-DOTFILES_TARGET_DIR="${HOME}/git/github/dotfiles"
+GITHUB_DIR="${HOME}/git/github"
+DOTFILES_TARGET_DIR="${GITHUB_DIR}/dotfiles"
+WALLPAPERS_TARGET_DIR="${GITHUB_DIR}/wallpapers"
 
 # ----------------------------------------------------------------------------
 # EXECUTION
@@ -29,6 +31,10 @@ main() {
   _print_msg "Cloning and installing dotfiles from GitHub..."
   git clone https://github.com/stenioas/dotfiles.git ${DOTFILES_TARGET_DIR}
   bash ${DOTFILES_TARGET_DIR}/install-dotfiles.sh
+
+  _print_msg "Cloning wallpapers from GitHub..."
+  _print_msg "Wallpapers installation..."
+  git clone https://github.com/stenioas/wallpapers.git ${WALLPAPERS_TARGET_DIR}
 }
 
 main

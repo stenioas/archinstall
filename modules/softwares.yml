@@ -5,6 +5,7 @@ description: >
   A module to install common software packages for general use.
   This includes web browsers, media players, and other essential applications.
   You can customize the list of packages as needed.
+
 packages:
   - firefox
   - firefox-i18n-pt-br
@@ -12,3 +13,8 @@ packages:
   - inkscape
   - vlc
   - pavucontrol
+
+aur_packages:
+  - spotify
+  - visual-studio-code-bin
+  - google-chrome

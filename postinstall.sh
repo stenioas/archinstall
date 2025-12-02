@@ -148,4 +148,5 @@ EOF
 }
 
 # Redirect all output (stdout and stderr) to both terminal and log file
-main 2>&1 | tee -a "${LOG_FILE}"
+# Remove ANSI color codes from log file using sed
+main 2>&1 | tee >(sed 's/\x1b\[[0-9;]*m//g' >> "${LOG_FILE}")
