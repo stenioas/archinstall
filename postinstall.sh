@@ -118,7 +118,7 @@ EOF
   #------------------------------#
   _print_title "System Cleanup"
   _print_msg "Cleaning package cache..."
-  sudo pacman -Scc --noconfirm
+  yes S | sudo pacman -Scc
 
   local orphans_packages
   orphans_packages=$(pacman -Qdtq || true)
