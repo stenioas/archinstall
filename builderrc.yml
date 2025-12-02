@@ -3,7 +3,6 @@ modules:
   - dm/ly
   - gfx/intel
   - gfx/nvidia
-  - aur
   - bluetooth
   #- codecs
   - custom

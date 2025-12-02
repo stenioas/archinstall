@@ -17,6 +17,7 @@ trap "tput cnorm" EXIT # Ensures the cursor returns to normal
 trap "exit 1" INT      # Ensures the script stops with Ctrl+C
 sudo -v                # Ensures the sudo password is ready
 
+# shellcheck disable=SC1090
 . <(curl -fsSL https://raw.githubusercontent.com/stenioas/bash-toolkit/main/bash-toolkit.lib)
 
 # ============================================================================
@@ -40,11 +41,13 @@ main() {
   # LOG INITIALIZATION
   #------------------------------#
   # Initialize log file
-  echo "==================================================================" > "${LOG_FILE}"
-  echo "  ${SCRIPT_TITLE} - v${SCRIPT_VERSION}" >> "${LOG_FILE}"
-  echo "  Started at: $(date '+%Y-%m-%d %H:%M:%S')" >> "${LOG_FILE}"
-  echo "==================================================================" >> "${LOG_FILE}"
-  echo "" >> "${LOG_FILE}"
+  {
+    echo "=================================================================="
+    echo "  ${SCRIPT_TITLE} - v${SCRIPT_VERSION}"
+    echo "  Started at: $(date '+%Y-%m-%d %H:%M:%S')"
+    echo "=================================================================="
+    echo ""
+  } > "${LOG_FILE}"
 
 
   #------------------------------#
@@ -59,7 +62,8 @@ main() {
   #------------------------------#
   clear
 
-  local banner=$(cat << 'EOF'
+  local banner
+  banner=$(cat << 'EOF'
     _    _     ____ ___ ____  
    / \  | |   |  _ \_ _/ ___| 
   / _ \ | |   | |_) | |\___ \ 
@@ -68,7 +72,8 @@ main() {
 EOF
 )
 
-  local msg=$(cat << EOF
+  local msg
+  msg=$(cat << EOF
 This script is a personal tool. I created it to simplify my life
 and  automate my Arch Linux post-installation process. It reflects
 my choices,  and is not a tutorial or a guide. Feel free to use it,
@@ -79,7 +84,8 @@ See here for more details: https://github.com/stenioas/archinstall
 EOF
   )
 
-  local alert=$(cat << EOF
+  local alert
+  alert=$(cat << EOF
   
 ── ATTENTION! ──────────────────────────────────────────────────────
  The script will run automatically, but you may be asked for your
@@ -90,7 +96,7 @@ EOF
   )
 
   _print_msg "$(set_bcyan)${banner}$(reset)"
-  _print_msg "\n Welcome to my $(set_bcyan)${SCRIPT_TITLE}$(reset) - v${SCRIPT_VERSION}$(reset)"
+  _print_msg "\nWelcome to my $(set_bcyan)${SCRIPT_TITLE}$(reset) - v${SCRIPT_VERSION}$(reset)"
   echo
   _print_msg "${msg}"
   _print_msg "$(set_byellow)${alert}$(reset)"
@@ -100,31 +106,31 @@ EOF
   #------------------------------#
   # INITIALIZATION
   #------------------------------#
-  bash ${SCRIPT_DIR}/scripts/configure-pacman.sh
-  bash ${SCRIPT_DIR}/scripts/bootstrap.sh
+  bash "${SCRIPT_DIR}"/scripts/configure-pacman.sh
+  bash "${SCRIPT_DIR}"/scripts/bootstrap.sh
 
 
   #------------------------------#
   # INSTALLATION
   #------------------------------#
-  bash ${SCRIPT_DIR}/scripts/install-aur-helper.sh
-  bash ${SCRIPT_DIR}/scripts/install-modules.sh
-  bash ${SCRIPT_DIR}/scripts/install-dotfiles.sh
-  bash ${SCRIPT_DIR}/scripts/configure-keyring.sh
-  bash ${SCRIPT_DIR}/scripts/install-themes.sh
+  bash "${SCRIPT_DIR}"/scripts/install-aur-helper.sh
+  bash "${SCRIPT_DIR}"/scripts/install-modules.sh
+  bash "${SCRIPT_DIR}"/scripts/install-dotfiles.sh
+  bash "${SCRIPT_DIR}"/scripts/configure-keyring.sh
+  bash "${SCRIPT_DIR}"/scripts/install-themes.sh
 
   #------------------------------#
   # SYSTEM CLEANUP
   #------------------------------#
   _print_title "System Cleanup"
   _print_msg "Cleaning package cache..."
-  yes S | sudo pacman -Scc
+  yes S 2>/dev/null | sudo pacman -Scc || true
 
   local orphans_packages
   orphans_packages=$(pacman -Qdtq || true)
   if [[ -n "${orphans_packages//[[:space:]]/}" ]]; then
     _print_msg "Removing unnecessary packages..."
-    sudo pacman -Rns --noconfirm ${orphans_packages}
+    sudo pacman -Rns --noconfirm "${orphans_packages}"
   else
     _print_msg "No orphaned packages to remove!"
   fi
@@ -138,11 +144,13 @@ EOF
   #------------------------------#
   # LOG FINALIZATION
   #------------------------------#
-  echo "" >> "${LOG_FILE}"
-  echo "==================================================================" >> "${LOG_FILE}"
-  echo "  Finished at: $(date '+%Y-%m-%d %H:%M:%S')" >> "${LOG_FILE}"
-  echo "  Log file: ${LOG_FILE}" >> "${LOG_FILE}"
-  echo "==================================================================" >> "${LOG_FILE}"
+  {
+    echo ""
+    echo "=================================================================="
+    echo "  Finished at: $(date '+%Y-%m-%d %H:%M:%S')"
+    echo "  Log file: ${LOG_FILE}"
+    echo "=================================================================="
+  } >> "${LOG_FILE}"
   
   _print_msg "\n$(set_bgreen)Log saved to:$(reset) ${LOG_FILE}"
 }
