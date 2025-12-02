@@ -148,4 +148,4 @@ EOF
 }
 
 # Redirect all output (stdout and stderr) to both terminal and log file
-main 2>&1 | tee -a "${LOG_FILE}""
+main 2>&1 | tee -a "${LOG_FILE}"

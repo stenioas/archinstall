@@ -60,7 +60,7 @@ main() {
     _print_title "Service enablement"
     for service in "${SVC_LIST[@]}"; do
       _print_msg "==> Enabling service: ${service}..."
-      sudo systemctl enable --now "${service}" || { echo "$(set_bred)Error:$(reset) Failed to enable service: ${service}"; exit 1; }
+      sudo systemctl enable "${service}" || { echo "$(set_bred)Error:$(reset) Failed to enable service: ${service}"; exit 1; }
     done
   fi
 }
