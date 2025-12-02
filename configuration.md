@@ -70,7 +70,6 @@ archinstall/
 │   │   ├── amd.yml
 │   │   ├── intel.yml
 │   │   └── nvidia.yml
-│   ├── aur.yml
 │   ├── bluetooth.yml
 │   ├── codecs.yml
 │   ├── custom.yml
@@ -100,7 +99,7 @@ archinstall/
 └── README.md
 ```
 
-- **modules/**: Each file (or file in a subfolder) is a module. You can define `commands`, `packages` and `services` arrays in each.
+- **modules/**: Each file (or file in a subfolder) is a module. You can define `commands`, `packages`, `aur_packages` and `services` arrays in each.
 - **builderrc.yml**: Only one property: `modules`, an array listing the modules to include in your post-installation. Use subfolder/module notation, e.g. `de/hyprland`.
 
 ### How to Add/Customize Modules
@@ -110,10 +109,6 @@ archinstall/
 - Add commands, pacman packages, AUR packages and services to each module as needed.
 - Reference only the modules you want in `builderrc.yml` using the correct path (e.g. `de/hyprland`).
 
-### Advanced: Module Commands
-
-- Add any shell commands to the `commands` array in your module (e.g. enable services, update user dirs, setup dotfiles).
-
 ### How the Builder Works
 
 The builder system is responsible for merging all selected modules and generating the final lists of commands, packages and services to be executed, installed and enabled, respectively, during the post-installation process. It works as follows:
@@ -121,14 +116,14 @@ The builder system is responsible for merging all selected modules and generatin
 1. **Module Selection:**
 
 - The modules you want to use are defined in `builderrc.yml` under the `modules` array.
-- Each module is a YAML file (or inside a subfolder) that can define its own `commands`, `packages` and `services` arrays.
+- Each module is a YAML file (or inside a subfolder) that can define its own `commands`, `packages`, `aur_packages` and `services` arrays.
 
 2. **Merging:**
 
-- When you run the `postinstall.sh` script, it automatically calls the `install-modules.sh` script, which in turn calls `builder.py` to read the selected modules, merge all their `commands`, `packages`, and `services`, and generate the unified lists.
-- The final **package list** will be installed before executing the command list, before enabling the service list configured in the modules, and will be organized alphabetically to avoid duplicates and ensure the correct installation order.
+- When you run the `postinstall.sh` script, it automatically calls the `install-modules.sh` script, which in turn calls `builder.py` to read the selected modules, merge all their `commands`, `packages`, `aur_packages` and `services`, and generate the unified lists.
+- The final **package list** and **aur package list** will be installed before executing the command list, before enabling the service list configured in the modules, and will be organized alphabetically to avoid duplicates and ensure the correct installation order.
 - The final **commands list** will be executed in the order in which the modules are read, and within each module, in the order they are defined. This means the execution order is determined by the order of modules in `builderrc.yml` and the manual order of commands inside each module file.
-- The final **service list** will be enabled in the order in which the modules are read, and within each module, in the order they are defined. This means the execution order is determined by the order of modules in `builderrc.yml` and the manual order of services inside each module file.
+- The final **service list** will be enabled organized alphabetically to avoid duplicates and ensure the correct installation order.
 
 For example, if you have two modules, `custom` and `extra`, and define the modules in `builderrc.yml` as:
 
@@ -196,7 +191,7 @@ packages:
   - google-chrome
   - spotify
 services:
-  - systemctl enable fstrim.timer
+  - fstrim.timer
 ```
 
 #### 3. Run the post-installation Script
