@@ -1,0 +1,12 @@
+# Ly Module
+---
+name: dm-ly
+description: >
+  A module to install and configure Ly (Lightweight TUI display manager) on the system.
+  This includes necessary packages and services to enable Ly functionality.
+
+packages:
+  - ly
+
+services:
+  - ly

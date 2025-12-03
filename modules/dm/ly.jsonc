@@ -1,8 +1,0 @@
-{
-  "packages": [
-    "ly" // Lightweight TUI display manager
-  ],
-  "services": [
-    "ly" // Enable Ly display manager service
-  ]
-}

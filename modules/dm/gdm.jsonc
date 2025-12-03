@@ -1,8 +1,0 @@
-{
-  "packages": [
-    "gdm" // GNOME Display Manager
-  ],
-  "services": [
-    "gdm" // Enable GDM display manager service
-  ]
-}

@@ -1,0 +1,10 @@
+# Gnome Module
+---
+name: de-gnome
+description: >
+  A module to install and configure the GNOME desktop environment on the system.
+  This includes necessary packages and services to enable GNOME functionality.
+
+packages:
+  - gnome
+  - gnome-tweaks

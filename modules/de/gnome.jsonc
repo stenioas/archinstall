@@ -1,6 +1,0 @@
-{
-  "packages": [
-    "gnome", // GNOME desktop environment
-    "gnome-tweaks" // GNOME customization tool
-  ]
-}
