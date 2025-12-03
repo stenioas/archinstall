@@ -9,6 +9,7 @@ trap "tput cnorm" EXIT # Ensures the cursor returns to normal
 trap "exit 1" INT      # Ensures the script stops with Ctrl+C
 sudo -v                # Ensures the sudo password is ready
 
+# shellcheck disable=SC1090
 . <(curl -fsSL https://raw.githubusercontent.com/stenioas/bash-toolkit/main/bash-toolkit.lib)
 
 # ----------------------------------------------------------------------------
@@ -31,7 +32,7 @@ main() {
   cd "${TEMP_DIR}/Catppuccin-GTK-Theme"
   ./themes/install.sh -t lavender -s compact -l
   dconf write /org/gnome/desktop/interface/gtk-theme "'Catppuccin-Lavender-Dark-Compact'"
-  cd ${HOME}
+  cd "${HOME}"
 
   _print_msg "Themes installation completed successfully!"
 }
