@@ -32,7 +32,7 @@ main() {
   sudo sed -i '/^#\[multilib\]/{N;s/#\[multilib\]\n#/[multilib]\n/}' /etc/pacman.conf
 
   _print_msg "Updating mirrorlist..."
-  sudo reflector -c Brazil --latest 10 --sort rate --verbose --save /etc/pacman.d/mirrorlist
+  sudo reflector -c Brazil --latest 6 --sort rate --verbose --save /etc/pacman.d/mirrorlist
 
   sudo pacman -Sy
 
