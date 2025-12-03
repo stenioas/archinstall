@@ -139,10 +139,11 @@ EOF
   yes S 2>/dev/null | sudo pacman -Scc || true
 
   local orphans_packages
-  orphans_packages=$(pacman -Qdtq || true)
-  if [[ -n "${orphans_packages//[[:space:]]/}" ]]; then
+  orphans_packages=$(pacman -Qdtq 2>/dev/null || true)
+  if [[ -n "${orphans_packages}" ]]; then
     _print_msg "Removing unnecessary packages..."
-    sudo pacman -Rns --noconfirm "${orphans_packages}"
+    # shellcheck disable=SC2086
+    sudo pacman -Rns --noconfirm ${orphans_packages}
   else
     _print_msg "No orphaned packages to remove!"
   fi
