@@ -33,6 +33,11 @@ main() {
   git clone https://github.com/stenioas/dotfiles.git "${DOTFILES_TARGET_DIR}"
   bash "${DOTFILES_TARGET_DIR}/install-dotfiles.sh"
 
+  if [[ -d ${WALLPAPERS_TARGET_DIR} ]]; then
+    _print_msg "Wallpapers folder already exists. A backup will be created in ${WALLPAPERS_TARGET_DIR}_old_$(date +%Y%m%d%H%M%S)!"
+    mv "${WALLPAPERS_TARGET_DIR}" "${WALLPAPERS_TARGET_DIR}_old_$(date +%Y%m%d%H%M%S)"
+  fi
+
   _print_msg "Cloning wallpapers from GitHub..."
   _print_msg "Wallpapers installation..."
   git clone https://github.com/stenioas/wallpapers.git "${WALLPAPERS_TARGET_DIR}"
