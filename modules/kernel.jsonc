@@ -1,6 +1,0 @@
-{
-  "packages": [
-    "linux-lts", // Long-term support Linux kernel.
-    "linux-lts-headers" // Header files and scripts for building modules for the LTS kernel.
-  ]
-}

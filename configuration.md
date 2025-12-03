@@ -7,41 +7,31 @@ This project also includes a base configuration for the official [archinstall](h
 - Kernel selection
 - Locale and timezone
 - Network configuration
-- Mirror and repository settings
-- Essential packages
-- Custom commands
-- Audio configuration
 
-You can customize this file to match your hardware, preferences, and installation requirements. It is used as input for the Archinstall process, ensuring a reproducible and automated base system setup before running post-install scripts and modular configuration.
+You can customize this file to match your hardware, preferences, and installation requirements. It is used as input for the Archinstall process, ensuring a reproducible and automated base system setup before running post-installation scripts and modular configuration.
 
-**Example: `archinstall/archinstall.config.json`**
+**Example: `archinstall.config.json`**
 
-```jsonc
+```yaml
 {
-  "kernels": ["linux-lts"],
-  "locale_config": {
-    "kb_layout": "us-acentos",
-    "sys_enc": "UTF-8",
-    "sys_lang": "pt_BR.UTF-8"
-  },
-  "timezone": "America/Fortaleza",
-  "network_config": {
-    "type": "nm"
-  },
-  "packages": ["linux-lts-headers", "git", "nano", "reflector"],
-  "custom_commands": [
-    "reflector -c Brazil --latest 10 --sort rate --save /etc/pacman.d/mirrorlist"
-  ],
-  "app_config": {
-    "audio_config": {
-      "audio": "pipewire"
-    }
-  },
-  "mirror_config": {
-    "optional_repositories": ["multilib"]
-  },
-  "services": [],
-  "version": "3.0.11"
+  'kernels': ['linux-lts'],
+  'locale_config':
+    {
+      'kb_layout': 'us-acentos',
+      'sys_enc': 'UTF-8',
+      'sys_lang': 'pt_BR.UTF-8',
+    },
+  'timezone': 'America/Fortaleza',
+  'network_config': { 'type': 'nm' },
+  'packages': ['linux-lts-headers', 'git', 'nano', 'reflector'],
+  'custom_commands':
+    [
+      'reflector -c Brazil --latest 10 --sort rate --save /etc/pacman.d/mirrorlist',
+    ],
+  'app_config': { 'audio_config': { 'audio': 'pipewire' } },
+  'mirror_config': { 'optional_repositories': ['multilib'] },
+  'services': [],
+  'version': '3.0.11',
 }
 ```
 
@@ -57,104 +47,118 @@ archinstall --config archinstall.config.json
 
 ### Features
 
-- Modular configuration: each file in `modules/` is a module with its own package and command lists
-- Supports `packages` and `commands` in each module
-- Flexible selection of modules for post-install via `builder.config.jsonc`
+- Modular configuration: each file in `modules/` is a module with its own commands, package and services lists
+- Supports `commands`, `packages` and `services` in each module
+- Flexible selection of modules for post-installation via `builderrc.yml`
 - Easily extensible for desktops (DE), display managers (DM), graphics (GFX), dotfiles, and custom hardware
 - Automated pacman and AUR installation
-- Custom post-install commands
+- Custom post-installation commands
 - One-command execution for full setup
 
 ### Structure
 
 ```
 archinstall/
-├── modules/
-│   ├── common.jsonc        # Essential packages/commands for any system
-│   ├── custom.jsonc        # Extra packages/commands (e.g. hardware-specific)
-│   ├── de/                 # Desktop environments
-│   │   ├── hyprland.jsonc  # Example: Hyprland DE
-│   │   └── kde.jsonc       # Example: KDE DE
-│   ├── dm/                 # Display managers
-│   │   ├── ly.jsonc        # Example: ly DM
-│   │   └── sddm.jsonc      # Example: SDDM DM
-│   ├── gfx/                # Graphics drivers
-│   │   ├── intel.jsonc     # Example: Intel graphics
-│   │   └── nvidia.jsonc    # Example: NVIDIA graphics
-│   └── ...                 # Add more as needed
-├── archinstall.config.json # Archinstall configuration
-├── builder.config.jsonc    # Selects which modules to use
-├── builder.py              # Merges modules and outputs lists
-├── extra_commands.sh       # Extra commands script
-├── postinstall.sh          # Runs the full post-install automation
+├── modules
+│   ├── de
+│   │   ├── gnome.yml
+│   │   └── hyprland.yml
+│   ├── dm
+│   │   ├── gdm.yml
+│   │   └── ly.yml
+│   ├── gfx
+│   │   ├── amd.yml
+│   │   ├── intel.yml
+│   │   └── nvidia.yml
+│   ├── bluetooth.yml
+│   ├── codecs.yml
+│   ├── custom.yml
+│   ├── development.yml
+│   ├── extras.yml
+│   ├── fonts.yml
+│   ├── install-module.sh
+│   ├── pipewire.yml
+│   ├── softwares.yml
+│   ├── utilities.yml
+│   └── virt-manager.yml
+├── scripts
+│   ├── bootstrap.sh
+│   ├── configure-keyring.sh
+│   ├── configure-pacman.sh
+│   ├── install-aur-helper.sh
+│   ├── install-dotfiles.sh
+│   ├── install-modules.sh
+│   └── install-themes.sh
+├── archinstall.config.json
+├── builder.py
+├── builderrc.yml
+├── configuration.md
+├── draft_installation_guide.md
 ├── LICENSE
-├── README.md
+├── postinstall.sh
+└── README.md
 ```
 
-- **modules/**: Each file (or file in a subfolder) is a module. You can define `packages` and `commands` arrays in each.
-- **builder.config.jsonc**: Only one property: `modules`, an array listing the modules to include in your post-install. Use subfolder/module notation, e.g. `de/hyprland`.
+- **modules/**: Each file (or file in a subfolder) is a module. You can define `commands`, `packages`, `aur_packages` and `services` arrays in each.
+- **builderrc.yml**: Only one property: `modules`, an array listing the modules to include in your post-installation. Use subfolder/module notation, e.g. `de/hyprland`.
 
 ### How to Add/Customize Modules
 
 - Create or edit files in `modules/` or its subfolders for each environment, hardware, or configuration you want.
 - Use clear names: `common`, `custom`, `dotfiles`, `de/*`, `dm/*`, `gfx/*`, etc.
-- Add your packages, AUR packages, and commands to each module as needed.
-- Reference only the modules you want in `builder.config.jsonc` using the correct path (e.g. `de/hyprland`).
-
-### Advanced: Module Commands and Extra Commands
-
-- Add any shell commands to the `commands` array in your module (e.g. enable services, update user dirs, setup dotfiles).
-- Add any extra shell commands to the `extra_commands.sh` file; they will be executed at the end of the post-install script.
+- Add commands, pacman packages, AUR packages and services to each module as needed.
+- Reference only the modules you want in `builderrc.yml` using the correct path (e.g. `de/hyprland`).
 
 ### How the Builder Works
 
-The builder system is responsible for merging all selected modules and generating the final lists of packages and commands to be installed and executed during the post-install process. It works as follows:
+The builder system is responsible for merging all selected modules and generating the final lists of commands, packages and services to be executed, installed and enabled, respectively, during the post-installation process. It works as follows:
 
 1. **Module Selection:**
 
-- The modules you want to use are defined in `builder.config.jsonc` under the `modules` array.
-- Each module is a JSONC file (or inside a subfolder) that can define its own `packages` and `commands` arrays.
+- The modules you want to use are defined in `builderrc.yml` under the `modules` array.
+- Each module is a YAML file (or inside a subfolder) that can define its own `commands`, `packages`, `aur_packages` and `services` arrays.
 
 2. **Merging:**
 
-- When you run `postinstall.sh`, it automatically calls `builder.py` to read the selected modules, merge all their `packages` and `commands`, and output unified lists.
-- The final **package list** will be sorted alphabetically to avoid duplicates and ensure a clean install order.
-- The **commands list** will be executed in the order in which the modules are read, and within each module, in the order they are defined. This means the execution order is determined by the order of modules in `builder.config.jsonc` and the manual order of commands inside each module file.
+- When you run the `postinstall.sh` script, it automatically calls the `install-modules.sh` script, which in turn calls `builder.py` to read the selected modules, merge all their `commands`, `packages`, `aur_packages` and `services`, and generate the unified lists.
+- The final **package list** and **aur package list** will be installed before executing the command list, before enabling the service list configured in the modules, and will be organized alphabetically to avoid duplicates and ensure the correct installation order.
+- The final **commands list** will be executed in the order in which the modules are read, and within each module, in the order they are defined. This means the execution order is determined by the order of modules in `builderrc.yml` and the manual order of commands inside each module file.
+- The final **service list** will be enabled organized alphabetically to avoid duplicates and ensure the correct installation order.
 
-For example, if you have two modules, `custom` and `extra`, and define the modules in `builder.config.jsonc` as:
+For example, if you have two modules, `custom` and `extra`, and define the modules in `builderrc.yml` as:
 
-```jsonc
-{
-  "modules": ["extra", "custom"]
-}
+```yaml
+modules:
+  - extra
+  - custom
 ```
 
-And in `modules/custom.jsonc`:
+And in `modules/custom.yml`:
 
-```jsonc
-{
-  "commands": ["echo 'custom command 2'", "echo 'custom command 1'"]
-}
+```yaml
+commands:
+  - echo 'custom command 2'
+  - echo 'custom command 1'
 ```
 
-And in `modules/extras.jsonc`:
+And in `modules/extra.yml`:
 
-```jsonc
-{
-  "commands": ["echo 'extra command 1'", "echo 'extra command 2'"]
-}
+```yaml
+commands:
+  - echo 'extra command 1'
+  - echo 'extra command 2'
 ```
 
 The execution order will be:
 
-1. `echo 'extras command 1'`
-2. `echo 'extras command 2'`
+1. `echo 'extra command 1'`
+2. `echo 'extra command 2'`
 3. `echo 'custom command 2'`
 4. `echo 'custom command 1'`
 
 5. **Execution:**
 
-- The post-install script then installs all packages and executes all commands in the correct order.
+- The post-installation script installs all packages, runs all commands, and enables all services in the correct order.
 
 You do not need to run `builder.py` manually. The process is fully automated by `postinstall.sh`, ensuring a modular, flexible, and reproducible setup.
 
@@ -162,60 +166,66 @@ You do not need to run `builder.py` manually. The process is fully automated by 
 
 #### 1. Select your modules
 
-Edit `builder.config.jsonc` and set the `modules` array to include the modules you want for your system. Use the format `folder/module` for modules inside subfolders. Example:
+Edit `builderrc.yml` and set the `modules` array to include the modules you want for your system. Use the format `folder/module` for modules inside subfolders. Example:
 
-```jsonc
-{
-  "modules": [
-    "common", // always included
-    "custom", // hardware-specific extras (e.g. sof-firmware for Galaxy Book 4)
-    "de/hyprland", // desktop environment
-    "dm/ly", // display manager
-    "gfx/intel", // graphics driver
-    "your_custom_module" // Your own custom module
-  ]
-}
+```yaml
+modules:
+  - common # always included
+  - custom # hardware-specific extras (e.g. sof-firmware for Galaxy Book 4)
+  - de/hyprland # desktop environment
+  - dm/ly # display manager
+  - gfx/intel # graphics driver
+  - your_custom_module # Your own custom module
 ```
 
 #### 2. Define your modules
 
-Each module file (e.g. `modules/common.jsonc`, `modules/de/hyprland.jsonc`) can contain any of these arrays:
+Each module file (e.g. `modules/common.yml`, `modules/de/hyprland.yml`) can contain any of these arrays:
 
-```jsonc
-{
-  "packages": ["nano", "git", "google-chrome", "spotify"],
-  "commands": ["systemctl enable fstrim.timer", "xdg-user-dirs-update"]
-}
+```yaml
+commands:
+  - xdg-user-dirs-update
+packages:
+  - nano
+  - git
+  - google-chrome
+  - spotify
+services:
+  - fstrim.timer
 ```
 
-#### 3. Run the Post-Install Script
+#### 3. Run the post-installation Script
 
 To automate the installation and configuration of all selected modules, simply run:
 
 ```bash
-bash postinstall.sh
+./postinstall.sh
 ```
 
-> 💡 _The `postinstall.sh` script will automatically use the builder system to merge all selected modules, generate the package and command lists, and execute the necessary steps for your setup. You do not need to run `builder.py` manually._
+> 💡 _The `postinstall.sh` script will automatically use the builder system to merge all selected modules, generate the commands, package and service lists, and execute the necessary steps for your setup. You do not need to run `builder.py` manually._
 
 This script will:
 
 - Check your connection
-- Configure temporary folders
+- Check dependencies
 - Configure pacman.conf
-- Install AUR Helper (YAY)
+- Install AUR Helper
 - Install all pacman and AUR packages
-- Execute all post-install commands
-- Clean up
+- Execute all post-installation commands
+- Enable all services
+- Install dotfiles
+- Configure keyring
+- Install themes and icons
+- Clean up installation
 
 ### Troubleshooting
 
 - If a module is missing, the script will show an error and stop.
-- Make sure all modules listed in `builder.config.jsonc` exist in the `modules/` folder.
+- Make sure all modules listed in `builderrc.yml` exist in the `modules/` folder.
 - For builder help, run:
 
 ```bash
-python3 builder.py --help
+./builder.py --help
 ```
 
 ### Contribution
@@ -225,7 +235,7 @@ Feel free to fork, open issues, or submit pull requests to improve modularity, a
 ### Requirements
 
 - Arch Linux base system
-- Python 3
+- Python 3 and PyYAML
 - Bash
 - Internet connection for package installation
 

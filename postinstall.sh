@@ -8,8 +8,8 @@
 # License     : GNU/GPL v3.0
 
 # ============================================================================
-# INITIALIZATION AND CLEANUP COMMANDS (TRAP/SUDO)
-# ============================================================================
+# INITIALIZATION
+# ----------------------------------------------------------------------------
 
 set -euo pipefail
 
@@ -17,121 +17,8 @@ trap "tput cnorm" EXIT # Ensures the cursor returns to normal
 trap "exit 1" INT      # Ensures the script stops with Ctrl+C
 sudo -v                # Ensures the sudo password is ready
 
-# ============================================================================
-# FUNCTIONS
-# ----------------------------------------------------------------------------
-
-_welcome() {
-  clear
-  echo -e "${BCYAN}${BANNER}${RESET}"
-  echo -e "\n Welcome to my ${BCYAN}${SCRIPT_TITLE}${RESET} - v${SCRIPT_VERSION}${RESET}"
-  echo
-
-  local msg=$(cat << EOF
- This script is a personal tool. I created it to simplify my life
- and  automate my Arch Linux post-installation process. It reflects
- my choices,  and is not a tutorial or a guide. Feel free to use it,
- adapt, modify, fork, and play around, but use it at your own risk!
- I hope it helps you too!
-
- See here for more details: https://github.com/stenioas/archinstall
-EOF
-  )
-
-  local alert=$(cat << EOF
-  
- ── ATTENTION! ──────────────────────────────────────────────────────
-  The script will run automatically, but you may be asked for your
-  password. Stay alert. Please ensure you have read the usage
-  instructions entirely before proceeding.
- ────────────────────────────────────────────────────────────────────
-EOF
-  )
-  
-  echo -e "${msg}"
-  echo -e "${BYELLOW}${alert}${RESET}"
-}
-
-_pause() {
-  local pause_msg=" Press any key to continue or [ctrl + c] to exit..."
-  echo -e "\n${pause_msg}"
-
-  tput civis
-  read -n 1 -s -r
-  tput cnorm
-}
-
-_print_title() {
-  local title="${BYELLOW}${1^^}${RESET}"
-  echo -e "\n${title}"
-}
-
-_print_msg() {
-  local message="${1}..."
-  echo -e "${message}"
-}
-
-_check_connection() {
-  ping -q -w 1 -c 1 8.8.8.8
-
-  if [[ $? -ne 0 ]]; then
-    echo -e "You have no connection!"
-    exit 1
-  fi
-}
-
-_configure_environment() {
-  _print_msg "Creating temp folder"
-  mkdir -p ${TMP_DIR}
-
-  _print_msg "Configuring pacman"
-  sudo sed -i '4,$s/^#Color/Color/' /etc/pacman.conf
-  sudo sed -i '4,$s/^#VerbosePkgLists/VerbosePkgLists/' /etc/pacman.conf
-  sudo sed -i 's/^ParallelDownloads = [0-9]\+/ParallelDownloads = 20/' /etc/pacman.conf
-
-  _print_msg "Updating mirrorlist"
-  sudo reflector -c Brazil --latest 10 --sort rate --verbose --save /etc/pacman.d/mirrorlist
-}
-
-_install_aur_helper() {
-  _print_title "Install YAY -  AUR helper"
-  if pacman -Qi yay &> /dev/null; then
-    _print_msg "YAY is already installed"
-    return
-  fi
-  [[ -d "${TMP_DIR}/yay" ]] && rm -rf "${TMP_DIR}/yay"
-  git clone https://aur.archlinux.org/yay.git "${TMP_DIR}/yay"
-  cd "${TMP_DIR}/yay"
-  makepkg -csi --noconfirm
-  cd ${HOME}
-}
-
-_install_packages() {
-  _print_title "Install packages"
-  yay -S --noconfirm --needed "${PKG_LIST[@]}"
-}
-
-_execute_commands() {
-  _print_title "Execute additional commands"
-  for cmd in "${CMD_LIST[@]}"; do
-    _print_msg "Executing command: ${cmd}"
-    eval "${cmd}" || { echo "${BRED}Error:${RESET} Command failed: ${cmd}"; exit 1; }
-  done
-
-  # Extra commands
-  bash "${SCRIPT_DIR}/extra_commands.sh"
-}
-
-_clean() {
-  _print_msg "Cleaning package cache"
-  sudo pacman -Scc --noconfirm
-  _print_msg "Removing unnecessary packages"
-  sudo pacman -Rns $(pacman -Qdtq) || true
-  _print_msg "Removing temporary folder"
-  sudo rm -rf "${TMP_DIR}"
-
-  echo -e "\n${BGREEN}All done!${RESET} You can now restart your system."
-}
+# shellcheck disable=SC1090
+. <(curl -fsSL https://raw.githubusercontent.com/stenioas/bash-toolkit/main/bash-toolkit.lib)
 
 # ============================================================================
 # .ENV
@@ -139,71 +26,141 @@ _clean() {
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-IFS=$'\n\t'
+SCRIPT_TITLE="Arch Linux Post-Installation Script"
+SCRIPT_VERSION="1.0.0-beta"
 
-# PACKAGE LIST
-if [[ -f ${SCRIPT_DIR}/builder.py ]]; then
-  mapfile -t PKG_LIST < <(python3 ${SCRIPT_DIR}/builder.py --list packages)
-else
-  PKG_LIST=()
-fi
+# Log file configuration
+LOG_FILE="${HOME}/postinstall-$(date +%Y%m%d-%H%M%S).log"
 
-# COMMAND LIST
-if [[ -f ${SCRIPT_DIR}/builder.py ]]; then
-  mapfile -t CMD_LIST < <(python3 ${SCRIPT_DIR}/builder.py --list commands)
-else
-  CMD_LIST=()
-fi
+# ============================================================================
+# EXECUTION
+# ----------------------------------------------------------------------------
 
-BANNER=$(cat << 'EOF'
-   ___   __   ___  ________
-  / _ | / /  / _ \/  _/ __/
- / __ |/ /__/ ___// /_\ \  
-/_/ |_/____/_/  /___/___/  
+
+# Function to initialize log
+initialize_log() {
+  {
+    echo "=================================================================="
+    echo "  ${SCRIPT_TITLE} - v${SCRIPT_VERSION}"
+    echo "  Started at: $(date '+%Y-%m-%d %H:%M:%S')"
+    echo "=================================================================="
+    echo ""
+  } > "${LOG_FILE}"
+}
+
+# Function to finalize log
+finalize_log() {
+  {
+    echo ""
+    echo "=================================================================="
+    echo "  Finished at: $(date '+%Y-%m-%d %H:%M:%S')"
+    echo "  Log file: ${LOG_FILE}"
+    echo "=================================================================="
+  } >> "${LOG_FILE}"
+  
+  echo -e "\n$(set_bgreen)Log saved to:$(reset) ${LOG_FILE}"
+}
+
+main() {
+  #------------------------------#
+  # CHECK
+  #------------------------------#
+  # bash-toolkit function
+  _check_connection
+
+
+  #------------------------------#
+  # WELCOME MESSAGE
+  #------------------------------#
+  clear
+
+  local banner
+  banner=$(cat << 'EOF'
+    _    _     ____ ___ ____  
+   / \  | |   |  _ \_ _/ ___| 
+  / _ \ | |   | |_) | |\___ \ 
+ / ___ \| |___|  __/| | ___) |
+/_/   \_\_____|_|  |___|____/ 
 EOF
 )
 
-SCRIPT_TITLE="Arch Linux Post-Installation Script"
-SCRIPT_VERSION="1.0.0-beta"
-TMP_DIR="$HOME/Downloads/TEMP"
+  local msg
+  msg=$(cat << EOF
+This script is a personal tool. I created it to simplify my life
+and  automate my Arch Linux post-installation process. It reflects
+my choices,  and is not a tutorial or a guide. Feel free to use it,
+adapt, modify, fork, and play around, but use it at your own risk!
+I hope it helps you too!
 
-# COLORS
-BOLD=$(tput bold)
-RESET=$(tput sgr0)
+See here for more details: https://github.com/stenioas/archinstall
+EOF
+  )
 
-# Regular Colors
-BLACK=$(tput setaf 0)
-RED=$(tput setaf 1)
-GREEN=$(tput setaf 2)
-YELLOW=$(tput setaf 3)
-BLUE=$(tput setaf 4)
-PURPLE=$(tput setaf 5)
-CYAN=$(tput setaf 6)
-WHITE=$(tput setaf 7)
+  local alert
+  alert=$(cat << EOF
+  
+── ATTENTION! ──────────────────────────────────────────────────────
+ The script will run automatically, but you may be asked for your
+ password. Stay alert. Please ensure you have read the usage
+ instructions entirely before proceeding.
+────────────────────────────────────────────────────────────────────
+EOF
+  )
 
-# Bold Colors
-BBLACK=${BOLD}${BLACK}
-BRED=${BOLD}${RED}
-BGREEN=${BOLD}${GREEN}
-BYELLOW=${BOLD}${YELLOW}
-BBLUE=${BOLD}${BLUE}
-BPURPLE=${BOLD}${PURPLE}
-BCYAN=${BOLD}${CYAN}
-BWHITE=${BOLD}${WHITE}
-
-# ============================================================================
-# MAIN
-# ----------------------------------------------------------------------------
-
-main() {
-  _check_connection
-  _welcome
+  _print_msg "$(set_bcyan)${banner}$(reset)"
+  _print_msg "\nWelcome to my $(set_bcyan)${SCRIPT_TITLE}$(reset) - v${SCRIPT_VERSION}$(reset)"
+  echo
+  _print_msg "${msg}"
+  _print_msg "$(set_byellow)${alert}$(reset)"
   _pause
-  _configure_environment
-  _install_aur_helper
-  _install_packages
-  _execute_commands
-  _clean
+
+
+  #------------------------------#
+  # INITIALIZATION
+  #------------------------------#
+  bash "${SCRIPT_DIR}"/scripts/configure-pacman.sh
+  bash "${SCRIPT_DIR}"/scripts/bootstrap.sh
+
+
+  #------------------------------#
+  # INSTALLATION
+  #------------------------------#
+  bash "${SCRIPT_DIR}"/scripts/install-aur-helper.sh
+  bash "${SCRIPT_DIR}"/scripts/install-modules.sh
+  bash "${SCRIPT_DIR}"/scripts/install-dotfiles.sh
+  bash "${SCRIPT_DIR}"/scripts/configure-keyring.sh
+  bash "${SCRIPT_DIR}"/scripts/install-themes.sh
+
+  #------------------------------#
+  # SYSTEM CLEANUP
+  #------------------------------#
+  _print_title "System Cleanup"
+  _print_msg "Cleaning package cache..."
+  yes S 2>/dev/null | sudo pacman -Scc || true
+
+  local orphans_packages
+  orphans_packages=$(pacman -Qdtq 2>/dev/null || true)
+  if [[ -n "${orphans_packages}" ]]; then
+    _print_msg "Removing unnecessary packages..."
+    # shellcheck disable=SC2086
+    sudo pacman -Rns --noconfirm ${orphans_packages}
+  else
+    _print_msg "No orphaned packages to remove!"
+  fi
+
+  #------------------------------#
+  # FINISH
+  #------------------------------#
+  _print_msg "\n$(set_bgreen)All done! $(set_bcyan)You can now restart your system.$(reset)"
 }
 
-main
+
+initialize_log
+
+# Redirect all output (stdout and stderr) to both terminal and log file
+# Remove ANSI color codes from log file using sed
+main 2>&1 | tee >(sed 's/\x1b\[[0-9;]*m//g' >> "${LOG_FILE}")
+
+# Wait for background processes and finalize log
+wait
+finalize_log

@@ -1,7 +1,0 @@
-{
-  // The packages in this module install the user's dotfiles.
-  // Verify the script/install-dotfiles.sh.
-  "commands": [
-    "bash ${SCRIPT_DIR}/install-scripts/install-dotfiles.sh" // Install dotfiles from the repository.
-  ]
-}

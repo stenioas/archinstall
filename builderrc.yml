@@ -1,0 +1,14 @@
+modules:
+  - de/hyprland
+  - dm/ly
+  - gfx/intel
+  - gfx/nvidia
+  - bluetooth
+  #- codecs
+  - custom
+  - development
+  #- extras
+  - fonts
+  - pipewire
+  - softwares
+  - utilities

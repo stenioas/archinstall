@@ -1,0 +1,14 @@
+# Intel Graphics Module
+---
+name: gfx-intel
+description: >
+  A module to install and configure Intel graphics support on the system.
+  This includes necessary packages and drivers for Intel GPUs.
+
+packages:
+  - mesa
+  - lib32-mesa
+  - intel-media-driver
+  - vulkan-intel
+  - lib32-vulkan-intel
+  - libva-intel-driver

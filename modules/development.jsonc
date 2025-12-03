@@ -1,7 +1,0 @@
-{
-  "packages": [
-    "git", // Distributed version control system.
-    "github-cli", // GitHub command line tool.
-    "python" // High-level general-purpose programming language.
-  ]
-}

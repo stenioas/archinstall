@@ -1,74 +1,130 @@
 #!/usr/bin/env python3
 
-
-import json
+import argparse
 import os
 import sys
 
 
-def load_jsonc(path):
-    """Load a JSON or JSONC file, stripping comments if needed."""
-    with open(path, encoding="utf-8") as f:
-        lines = []
-        for line in f:
-            line = strip_jsonc_comments(line)
-            lines.append(line)
-        return json.loads(''.join(lines))
+# Attempt to import PyYAML. This dependency must be installed via 
+# system package manager (python3-yaml/python-yaml) or pip.
+try:
+    import yaml
+except ImportError:
+    print("Error: PyYAML module is missing.", file=sys.stderr)
+    print("Please install it using: sudo pacman -S python-yaml (Arch) or sudo apt install python3-yaml (Pop!_OS)", file=sys.stderr)
+    sys.exit(1)
 
 
-def strip_jsonc_comments(line):
-    in_string = False
-    result = ''
-    i = 0
-    while i < len(line):
-        if line[i] == '"' and (i == 0 or line[i-1] != '\\'):
-            in_string = not in_string
-        if not in_string and line[i:i+2] == '//':
-            break
-        result += line[i]
-        i += 1
-    return result
+def load_yaml(path):
+    """Load a YAML file safely."""
+    if not os.path.exists(path):
+        raise FileNotFoundError(f"File '{path}' not found.")
+    
+    with open(path, 'r', encoding="utf-8") as f:
+        # returns None if file is empty, so we default to empty dict
+        return yaml.safe_load(f) or {}
 
 
-# Load builder config (JSONC)
-builder_config = load_jsonc("./builder.config.jsonc")
+def collect_builder_modules(config):
+    """
+    Iterates through modules defined in config and aggregates lists.
+    Returns sets/lists of commands, packages, and services.
+    """
+    commands = set()
+    packages = set()
+    aur_packages = set()
+    services = set()
 
+    # Get the list of modules from the configuration
+    module_list = config.get("modules", [])
 
-def collect_builder_modules():
-    pkgs, cmds = set(), set()
-
-    # Modules
-    for module in builder_config.get("modules", []):
-        module_path = f"./modules/{module}.jsonc"
+    for module in module_list:
+        # Construct the path based on your structure: ./modules/category/name.yml or ./modules/name.yml
+        module_path = f"./modules/{module}.yml"
+        
         if not os.path.exists(module_path):
-            raise KeyError(f"Error: Module file '{module_path}' not found.")
-        module_src = load_jsonc(module_path)
-        pkgs.update(module_src.get("packages", []))
-        cmds.update(module_src.get("commands", []))
+            print(f"Warning: Module file '{module_path}' not found. Skipping.", file=sys.stderr)
+            continue
 
-    return  sorted(pkgs), cmds
+        try:
+            module_src = load_yaml(module_path)
+            
+            # Update sets with data from the module, ensuring they are lists before update
+            if module_src.get("commands"):
+                commands.update(module_src["commands"])
+            
+            if module_src.get("packages"):
+                packages.update(module_src["packages"])
+            
+            if module_src.get("aur_packages"):
+                aur_packages.update(module_src["aur_packages"])
+                
+            if module_src.get("services"):
+                services.update(module_src["services"])
+                
+        except Exception as e:
+            print(f"Error reading module '{module}': {e}", file=sys.stderr)
+
+    return commands, sorted(packages), sorted(aur_packages), sorted(services)
 
 
 def main():
-    pkgs, cmds  = collect_builder_modules()
+    parser = argparse.ArgumentParser(
+        description="List packages, commands, and services from builder modules (YAML)."
+    )
+    
+    # Made --list required since we are no longer generating an output file
+    parser.add_argument(
+        "-l", "--list",
+        choices=["commands", "packages", "aur_packages", "services"],
+        required=True,
+        help="Type of list required: commands, packages, aur_packages or services."
+    )
+    
+    parser.add_argument(
+        "-m", "--module",
+        metavar="MODULE",
+        help="Target a specific module (overrides config file). E.g. de/gnome or gfx/intel."
+    )
+    
+    parser.add_argument(
+        "-c", "--config",
+        default="./builderrc.yml",
+        help="Path to the main configuration file listing the modules. Defaults to ./builderrc.yml"
+    )
 
-    def get_list_by_type(list_type):
-        if list_type == "packages":
-            return pkgs
-        elif list_type == "commands":
-            return cmds
-        else:
-            print("Invalid list type. Use one of: packages, commands.")
-            exit(1)
+    args = parser.parse_args()
 
-    if len(sys.argv) == 3 and sys.argv[1] in ("--list", "-l"):
-        list_type = sys.argv[2]
-        items = get_list_by_type(list_type)
-        print("\n".join(items))
-    elif len(sys.argv) == 2 and sys.argv[1] in ("--help", "-h"):
-        print("Usage: builder.py --list <packages|commands> or -l <packages|commands>")
+    # Determine configuration source: single module arg or config file
+    if args.module:
+        builder_config = {"modules": [args.module]}
     else:
-        print("Usage: builder.py --list <packages|commands> or -l <packages|commands>")
+        try:
+            builder_config = load_yaml(args.config)
+        except Exception as e:
+            print(f"Error loading configuration: {e}", file=sys.stderr)
+            sys.exit(1)
+
+    try:
+        commands, packages, aur_packages, services = collect_builder_modules(builder_config)
+    except Exception as e:
+        print(f"Error during module collection: {e}", file=sys.stderr)
+        sys.exit(1)
+
+    # Select output based on argument
+    items = []
+    if args.list == "packages":
+        items = packages
+    elif args.list == "commands":
+        items = sorted(list(commands)) # Sorted for deterministic output
+    elif args.list == "services":
+        items = sorted(list(services))
+    elif args.list == "aur_packages":
+        items = sorted(list(aur_packages))
+
+    # Print results to stdout
+    if items:
+        print("\n".join(items))
 
 if __name__ == "__main__":
     try:

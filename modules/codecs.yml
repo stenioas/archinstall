@@ -1,0 +1,16 @@
+# Codecs Module
+---
+name: codecs
+description: >
+  A module to install and configure multimedia codecs on the system.
+  This includes necessary packages to enable playback and encoding of various media formats.
+
+packages:
+  - gstreamer # Core GStreamer libraries.
+  - gst-libav # FFmpeg/Libav plugin for GStreamer.
+  - gst-plugins-base # GStreamer plugins (base set).
+  - gst-plugins-good # GStreamer plugins (good quality).
+  - gst-plugins-bad # GStreamer plugins (bad quality, may be buggy).
+  - gst-plugins-ugly # GStreamer plugins (ugly set, patented/proprietary).
+  - gst-plugin-pipewire # GStreamer plugin for PipeWire.
+  - ffmpeg # Multimedia framework for encoding and decoding.

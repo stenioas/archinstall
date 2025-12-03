@@ -1,0 +1,12 @@
+# GDM Module
+---
+name: dm-gdm
+description: >
+  A module to install and configure GDM (GNOME Display Manager) on the system.
+  This includes necessary packages and services to enable GDM functionality.
+
+packages:
+  - gdm
+
+services:
+  - gdm

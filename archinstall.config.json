@@ -1,24 +1,18 @@
 {
-  "app_config": {
-    "audio_config": {
-      "audio": "pipewire"
-    }
-  },
   "custom_commands": [],
+  "hostname": "gbook4",
   "kernels": ["linux-lts"],
   "locale_config": {
     "kb_layout": "us-acentos",
     "sys_enc": "UTF-8",
     "sys_lang": "pt_BR.UTF-8"
   },
-  "mirror_config": {
-    "optional_repositories": ["multilib"]
-  },
   "network_config": {
     "type": "nm"
   },
-  "packages": ["linux-lts-headers", "git", "nano", "reflector"],
+  "packages": ["linux-lts-headers", "git"],
+  "parallel_downloads": 12,
   "services": [],
   "timezone": "America/Fortaleza",
-  "version": "3.0.11"
+  "version": "3.0.14"
 }
