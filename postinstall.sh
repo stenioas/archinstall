@@ -36,11 +36,9 @@ LOG_FILE="${HOME}/postinstall-$(date +%Y%m%d-%H%M%S).log"
 # EXECUTION
 # ----------------------------------------------------------------------------
 
-main() {
-  #------------------------------#
-  # LOG INITIALIZATION
-  #------------------------------#
-  # Initialize log file
+
+# Function to initialize log
+initialize_log() {
   {
     echo "=================================================================="
     echo "  ${SCRIPT_TITLE} - v${SCRIPT_VERSION}"
@@ -48,8 +46,22 @@ main() {
     echo "=================================================================="
     echo ""
   } > "${LOG_FILE}"
+}
 
+# Function to finalize log
+finalize_log() {
+  {
+    echo ""
+    echo "=================================================================="
+    echo "  Finished at: $(date '+%Y-%m-%d %H:%M:%S')"
+    echo "  Log file: ${LOG_FILE}"
+    echo "=================================================================="
+  } >> "${LOG_FILE}"
+  
+  echo -e "\n$(set_bgreen)Log saved to:$(reset) ${LOG_FILE}"
+}
 
+main() {
   #------------------------------#
   # CHECK
   #------------------------------#
@@ -139,22 +151,15 @@ EOF
   # FINISH
   #------------------------------#
   _print_msg "\n$(set_bgreen)All done! $(set_bcyan)You can now restart your system.$(reset)"
-
-
-  #------------------------------#
-  # LOG FINALIZATION
-  #------------------------------#
-  {
-    echo ""
-    echo "=================================================================="
-    echo "  Finished at: $(date '+%Y-%m-%d %H:%M:%S')"
-    echo "  Log file: ${LOG_FILE}"
-    echo "=================================================================="
-  } >> "${LOG_FILE}"
-  
-  _print_msg "\n$(set_bgreen)Log saved to:$(reset) ${LOG_FILE}"
 }
+
+
+initialize_log
 
 # Redirect all output (stdout and stderr) to both terminal and log file
 # Remove ANSI color codes from log file using sed
 main 2>&1 | tee >(sed 's/\x1b\[[0-9;]*m//g' >> "${LOG_FILE}")
+
+# Wait for background processes and finalize log
+wait
+finalize_log
